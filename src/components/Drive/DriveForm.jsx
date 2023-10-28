@@ -13,9 +13,25 @@ export const DriveForm = ({
                               dates,
                               handleChangeCalendar,
                               handleChangeForm,
-    isWithNotes,
-                              children
+                              children,
+                              isDriver
                           }) => {
+
+    const chooseCarText = isDriver
+        ? 'Выберите марку вашей машины'
+        : 'Выберите подходящие марки машин'
+
+    const startChooseDayText = isDriver
+        ? 'Выберите дату отправления'
+        : 'Выберите самую ранюю дату начала поездки'
+
+    const endChooseDayText = isDriver
+        ? 'Выберите дату окончания поездки'
+        : 'Выберите самую позднюю дату окончания поездки'
+
+    const sourceChooseText = isDriver
+        ? 'Откуда начнётся поездка?'
+        : 'Откуда вы хотели бы начать поездку?'
 
     return (
 
@@ -28,16 +44,16 @@ export const DriveForm = ({
             <Stack spacing={8} sx={{maxWidth: 800, flexGrow: 1, p: 10}}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <Stack spacing={2} sx={{flexGrow: 1, p: 2}}>
-                        <FormItem>Выберите дату отправления</FormItem>
+                        <FormItem>{startChooseDayText}</FormItem>
                         <DateTimePicker
-                            value={convertToDayjs(dates.arrival_time)}
-                            onChange={(value) => handleChangeCalendar('arrival_time', value)}
+                            value={convertToDayjs(dates.departure_time)}
+                            onChange={(value) => handleChangeCalendar('departure_time', value)}
                         />
 
                     </Stack>
 
                     <Stack spacing={2} sx={{flexGrow: 1, p: 2}}>
-                        <FormItem>Откуда начнётся поездка?</FormItem>
+                        <FormItem>{sourceChooseText}</FormItem>
                         <Input
                             onChange={handleChangeForm}
                             name="source"
@@ -47,10 +63,10 @@ export const DriveForm = ({
                     </Stack>
 
                     <Stack spacing={2} sx={{flexGrow: 1, p: 2}}>
-                        <FormItem>Выберите дату окончания поездки</FormItem>
+                        <FormItem>{endChooseDayText}</FormItem>
                         <DateTimePicker
-                            value={convertToDayjs(dates.departure_time)}
-                            onChange={(value) => handleChangeCalendar('departure_time', value)}
+                            value={convertToDayjs(dates.arrival_time)}
+                            onChange={(value) => handleChangeCalendar('arrival_time', value)}
                         />
 
                     </Stack>
@@ -66,11 +82,12 @@ export const DriveForm = ({
                     </Stack>
 
                     <Stack spacing={2} sx={{flexGrow: 1, p: 2}}>
-                        <FormItem>Выберите марку вашей машины</FormItem>
+                        <FormItem>{chooseCarText}</FormItem>
                         <Select
                             name={"car_name"}
                             value={mainForm.car_name}
                             onChange={handleChangeForm}
+                            multiple={!isDriver}
                         >
                             {CAR_ITEMS.map(({value, label}) => (
                                 <MenuItem value={value} key={value}>{label}</MenuItem>))}
@@ -78,7 +95,7 @@ export const DriveForm = ({
                     </Stack>
 
                     {
-                        isWithNotes &&
+                        isDriver &&
                         <Stack spacing={2} sx={{flexGrow: 1, p: 2}}>
                             <FormItem>Комментарии</FormItem>
                             <TextareaAutosize

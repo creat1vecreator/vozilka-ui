@@ -9,6 +9,10 @@ export const convertToIsoString = (date) => {
     return dayjs(date).toISOString()
 }
 
+export const convertToUtcString = (date) => {
+    return dayjs(date).utc(true)
+}
+
 export const convertToDayjs = (date) => {
     return date ? dayjs(date) : null
 }

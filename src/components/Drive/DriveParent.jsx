@@ -1,9 +1,9 @@
 import {useEffect, useRef, useState} from 'react';
 import {useAuthContext} from "../../context/auth/useAuthContext";
-import {convertToIsoString} from "../../utils/dateUtils.js";
+import {convertToUtcString} from "../../utils/dateUtils.js";
 import {
     confirmDrive,
-    createDrive,
+    createDrive, getFilteredDrives,
     retrieveDriveRealTime
 } from "../../api/drive.js";
 import Button from "@mui/material/Button";
@@ -13,13 +13,13 @@ import {DriveForm} from "./DriveForm";
 import {AuthHeader} from "../Auth/AuthHeader/AuthHeader";
 
 
-export const  DriveParent = () => {
+export const DriveParent = () => {
     const {id, role} = useAuthContext();
     const isSubscribed = useRef(false)
     const [drives, setDrive] = useState([]);
     const isDriverRole = role === 'Водитель';
     const [mainForm, setMainForm] = useState({
-        car_name: '',
+        car_name: [],
         destination: '',
         notes: '',
         source: '',
@@ -29,32 +29,38 @@ export const  DriveParent = () => {
         departure_time: ''
     })
 
+    const body = {
+        ...mainForm,
+        ...dates,
+        driver_user_id: id
+    }
+
+
     useEffect(() => {
     }, [isSubscribed])
 
     const submitButtonText = isDriverRole
         ? 'Опубликовать поездку'
-        : 'Подписаться на поездки';
+        : 'Получить все подходящие поездки';
     const headerText = isDriverRole
         ? 'Заполните информацию о вашей поездке'
         : 'Выберите параметры для подписки';
 
     const handleChangeForm = (event) => {
-        setMainForm((prevForm) => ({...prevForm, [event.target.name]: event.target.value}));
+        const value = event.target.value
+        setMainForm((prevForm) => ({
+            ...prevForm, [event.target.name]:
+                    value
+        }));
     }
 
     const handleChangeCalendar = (name, date) => {
-        setDates((prevDates) => ({...prevDates, [name]: convertToIsoString(date)}))
+        setDates((prevDates) => ({...prevDates, [name]: convertToUtcString(date)}))
     }
 
     const handleCreateDrive = async () => {
         if (!id) return
-
-        const body = {
-            ...mainForm,
-            ...dates,
-            driver_user_id: id
-        }
+        console.log('body:', body);
 
         try {
             await createDrive(body)
@@ -67,32 +73,59 @@ export const  DriveParent = () => {
         try {
             isSubscribed.current = false
             await confirmDrive(params)
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e)
         }
     }
 
     const handleSubscribe = async () => {
-        try {
-            if (!isSubscribed.current) return
-            const response = await retrieveDriveRealTime()
-            if (!response.ok) throw new Error()
+        if (!isSubscribed.current) return
 
-            const newDrives = await response.json()
-            setDrive((prevDrive) => [...prevDrive, ...newDrives])
-
-            if(isSubscribed) await handleSubscribe()
+        const bodyToRequest = {
+            ...body,
+            car_names: body.car_name
         }
-        catch (e) {
-            if(isSubscribed.current) await handleSubscribe()
+        delete bodyToRequest.driver_user_id
+        delete bodyToRequest.notes
+        delete bodyToRequest.name
+
+        try {
+
+            const response = await retrieveDriveRealTime(bodyToRequest)
+            if (!!response.error) throw new Error()
+
+            console.log('needed state', [...drives, ...response.data])
+            setDrive((prevDrive) => [...prevDrive, ...response.data])
+
+            if (isSubscribed.current) await handleSubscribe()
+        } catch (e) {
+            if (isSubscribed.current) await handleSubscribe()
+        }
+    }
+
+    const handleSuitableDrives = async () => {
+        const bodyToRequest = {
+            ...body,
+            car_names: body.car_name
+        }
+        delete bodyToRequest.driver_user_id
+        delete bodyToRequest.notes
+        delete bodyToRequest.name
+        try {
+            const {data} = await getFilteredDrives(bodyToRequest)
+            setDrive(data)
+
+            if (!isSubscribed.current) isSubscribed.current = true
+            await handleSubscribe()
+
+        } catch (e) {
         }
     }
 
 
     const handleSubmit = async () => {
         if (isDriverRole) return await handleCreateDrive()
-        await handleSubscribe()
+        await handleSuitableDrives()
     }
 
 
@@ -100,25 +133,22 @@ export const  DriveParent = () => {
         <div>
 
             <AuthHeader label={headerText}/>
-                <DriveForm
-                    mainForm={mainForm}
-                    dates={dates}
-                    handleChangeCalendar={handleChangeCalendar}
-                    handleChangeForm={handleChangeForm}
-                    isWithNotes={isDriverRole}
+            <DriveForm
+                mainForm={mainForm}
+                dates={dates}
+                handleChangeCalendar={handleChangeCalendar}
+                handleChangeForm={handleChangeForm}
+                isDriver={isDriverRole}
+            >
+                <Button
+                    onClick={handleSubmit}
+                    variant={BUTTON_MATERIAL_UI_VARIANTS.contained}
                 >
-                    <Button
-                        onClick={() => {
-                            isSubscribed.current = true
-                            handleSubmit();
-                        }}
-                        variant={BUTTON_MATERIAL_UI_VARIANTS.contained}
-                    >
-                        {submitButtonText}
-                    </Button>
-                </DriveForm>
+                    {submitButtonText}
+                </Button>
+            </DriveForm>
 
-                { !isDriverRole && <DrivesList handleConfirmDrive={handleConfirmDrive} list={drives}/>}
+            {!isDriverRole && <DrivesList handleConfirmDrive={handleConfirmDrive} list={drives}/>}
         </div>
     );
 };

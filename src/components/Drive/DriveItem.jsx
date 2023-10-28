@@ -4,9 +4,6 @@ import {BUTTON_MATERIAL_UI_VARIANTS} from "../../consts/variantConsts.js";
 import {useAuthContext} from "../../context/auth/useAuthContext";
 import {mainDateFormatter} from "../../utils/dateUtils.js";
 
-// interface IDriveItemProps extends IDrive {
-//     handleConfirmDrive: (params: IConfirmDriRequestDTO) => void
-// }
 
 export const DriveItem = ({
                               car_name,

@@ -3,8 +3,11 @@ import {Drive} from "../pages/drive/page";
 import {Main} from "../pages/main/Main";
 import {SignIn} from "../pages/sign-in/page";
 import {SignUp} from "../pages/sign-up/page";
+import {NotFound} from "../pages/not-found/NotFound";
+
 import {Layout} from '../components/Layout/Layout.jsx'
 import React from "react";
+
 
 
 export const AppRouter= () => {
@@ -16,6 +19,7 @@ export const AppRouter= () => {
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/drive" element={<Drive />} />
+              <Route path="/*" element={<NotFound />} />
           </Routes>
           </Layout>
       </BrowserRouter>
