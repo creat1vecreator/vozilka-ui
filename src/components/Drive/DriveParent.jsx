@@ -35,10 +35,6 @@ export const DriveParent = () => {
         driver_user_id: id
     }
 
-
-    useEffect(() => {
-    }, [isSubscribed])
-
     const submitButtonText = isDriverRole
         ? 'Опубликовать поездку'
         : 'Получить все подходящие поездки';
@@ -83,7 +79,7 @@ export const DriveParent = () => {
     const filterUniqueValues = (array) => {
         const result = []
         array.forEach((drive) => {
-            !result.find(drive.id) && result.push(drive)
+            !result.find((filteredDrive) => drive.id === filteredDrive.id) && result.push(drive)
         })
         return result
     }

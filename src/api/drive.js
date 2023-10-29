@@ -1,20 +1,5 @@
 import supabase from './supabase.js'
 
-// export interface ICreateDriveRequestDTO {
-//     arrival_time: string;
-//     car_name: string;
-//     departure_time: string;
-//     destination: string;
-//     driver_user_id: string;
-//     notes: string;
-//     source: string;
-// }
-//
-// export interface IConfirmDriRequestDTO {
-//     drive_id: string,
-//     passenger_id: string,
-// }
-
 export const createDrive = async (body) => {
 
     await supabase.functions.invoke('publish-drive', {
