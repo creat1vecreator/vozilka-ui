@@ -12,7 +12,7 @@ import React from "react";
 
 export const AppRouter= () => {
   return (
-      <BrowserRouter>
+      <BrowserRouter basename={'/vozilka-ui/'}>
           <Layout>
           <Routes>
               <Route index element={<Main/>}/>
