@@ -11,7 +11,7 @@ export const AfterAuth = ({ infoText, linkText, url, isInTheEnd = false }) => {
             <div className={cx(styles.afterAuth, { [styles.endPlacement ]: isInTheEnd })}>
                 <Typography variant={TYPOGRAPHY_MATERIAL_UI_VARIANTS.h6} marginRight={2}>{infoText} </Typography>
 
-                <CustomLink url={url}>
+                <CustomLink url={`${url}`}>
                     {linkText}
                 </CustomLink>
             </div>

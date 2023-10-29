@@ -1,4 +1,3 @@
-import {AuthHeader} from "../../components/Auth/AuthHeader/AuthHeader.jsx";
 import {AfterAuth} from "../../components/Auth/AfterAuth/AfterAuth.jsx"
 import {Stack} from "@mui/joy";
 

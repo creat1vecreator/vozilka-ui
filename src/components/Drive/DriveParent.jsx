@@ -16,7 +16,7 @@ import {AuthHeader} from "../Auth/AuthHeader/AuthHeader";
 export const DriveParent = () => {
     const {id, role} = useAuthContext();
     const isSubscribed = useRef(false)
-    const [drives, setDrive] = useState([]);
+    const [drives, setDrives] = useState([]);
     const isDriverRole = role === 'Водитель';
     const [mainForm, setMainForm] = useState({
         car_name: [],
@@ -80,6 +80,14 @@ export const DriveParent = () => {
         }
     }
 
+    const filterUniqueValues = (array) => {
+        const result = []
+        array.forEach((drive) => {
+            !result.find(drive.id) && result.push(drive)
+        })
+        return result
+    }
+
     const handleSubscribe = async () => {
         if (!isSubscribed.current) return
 
@@ -96,8 +104,8 @@ export const DriveParent = () => {
             const response = await retrieveDriveRealTime(bodyToRequest)
             if (!!response.error) throw new Error()
 
-            console.log('needed state', [...drives, ...response.data])
-            setDrive((prevDrive) => [...prevDrive, ...response.data])
+
+            setDrives((prevDrive) => filterUniqueValues([...prevDrive, ...response.data]))
 
             if (isSubscribed.current) await handleSubscribe()
         } catch (e) {
@@ -115,7 +123,7 @@ export const DriveParent = () => {
         delete bodyToRequest.name
         try {
             const {data} = await getFilteredDrives(bodyToRequest)
-            setDrive(data)
+            setDrives(filterUniqueValues(data))
 
             if (!isSubscribed.current) isSubscribed.current = true
             await handleSubscribe()
