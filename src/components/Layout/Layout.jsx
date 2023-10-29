@@ -15,7 +15,7 @@ export const Layout = ({ children }) => {
 
     useEffect( () => {
         authCheck().then((res) => {
-            // if (!res.isAuth && !publicRoutes.includes(location.pathname)) navigate('/');
+            if (!res.isAuth && !publicRoutes.includes(location.pathname)) navigate('/');
             setAuthInfo(res)
         })
     },[location])
