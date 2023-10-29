@@ -31,7 +31,7 @@ export const retrieveDriveRealTime = async (body) => {
 
 export const confirmDrive = async (body) => {
 
-    await supabase.functions.invoke('confirm-drive', {
+    return await supabase.functions.invoke('confirm-drive', {
         body,
     });
 }

@@ -72,7 +72,9 @@ export const DriveParent = () => {
     const handleConfirmDrive = async (params) => {
         try {
             isSubscribed.current = false
-            await confirmDrive(params)
+            const {data} = await confirmDrive(params)
+
+            if (data === 'confirmed') alert('Вы успешно подтвердили поездку')
         } catch (e) {
             console.error(e)
         }

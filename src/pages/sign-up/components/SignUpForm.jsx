@@ -1,6 +1,7 @@
 import { useState} from 'react';
 import {AuthForm} from '../../../components/Auth/AuthForm'
 import {AfterAuth} from "../../../components/Auth/AfterAuth/AfterAuth";
+import supabase from "../../../api/supabase.js";
 
 export const SignUpForm = () => {
     const [email, setEmail] = useState('')
@@ -31,7 +32,6 @@ export const SignUpForm = () => {
                     },
                 },
             })
-
         }
         catch (e) {
             console.error(e)
